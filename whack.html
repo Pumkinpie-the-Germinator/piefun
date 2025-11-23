@@ -1,0 +1,48 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whack-A-Mole</title>
+<link rel="icon" type="image/x-icon" href="pie.ico">
+<style>
+body{margin:0;background:#0f1724;color:white;font-family:Inter,system-ui;text-align:center;}
+h1{margin-top:40px;}
+.grid{display:grid;grid-template-columns:repeat(3,80px);grid-gap:10px;margin:50px auto;width:270px;}
+.hole{width:80px;height:80px;background:rgba(255,255,255,0.05);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;}
+.hole.active{background:#ffcc00;color:#071226;font-weight:700;}
+.score{font-size:24px;margin-top:20px;}
+</style>
+</head>
+<body>
+<h1>Whack-A-Mole</h1>
+<div class="score">Score: <span id="score">0</span></div>
+<div class="grid" id="grid"></div>
+<script>
+const grid = document.getElementById('grid');
+let score = 0;
+const holes = [];
+for(let i=0;i<9;i++){
+  const div = document.createElement('div');
+  div.className='hole';
+  grid.appendChild(div);
+  holes.push(div);
+}
+function mole(){
+  holes.forEach(h=>h.classList.remove('active'));
+  const index=Math.floor(Math.random()*holes.length);
+  holes[index].classList.add('active');
+}
+holes.forEach(h=>h.addEventListener('click',()=>{
+  if(h.classList.contains('active')){
+    score++;
+    document.getElementById('score').textContent=score;
+    h.classList.remove('active');
+  }
+}));
+setInterval(mole,1000);
+</script>
+</body>
+</html>
+

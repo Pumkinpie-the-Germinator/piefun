@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collision Game</title>
+<link rel="icon" type="image/x-icon" href="pie.ico">
+<style>
+body{margin:0;overflow:hidden;background:#0f1724;}
+canvas{display:block;margin:0 auto;background:#111;}
+.score{position:absolute;top:20px;left:50%;transform:translateX(-50%);color:white;font-family:sans-serif;font-size:24px;}
+</style>
+</head>
+<body>
+<div class="score">Time: 0</div>
+<canvas id="gameCanvas"></canvas>
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let player = {x: canvas.width/2, y: canvas.height/2, radius:20, color:'cyan'};
+let enemies = [];
+let score = 0;
+let gameOver = false;
+
+function spawnEnemy(){
+    const radius = 15 + Math.random()*10;
+    const x = Math.random()*(canvas.width - 2*radius) + radius;
+    const y = Math.random()*(canvas.height - 2*radius) + radius;
+    const dx = (Math.random()-0.5)*4;
+    const dy = (Math.random()-0.5)*4;
+    enemies.push({x,y,dx,dy,radius,color:'red'});
+}
+
+function update(){
+    if(gameOver) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    
+    // Draw player
+    ctx.beginPath();
+    ctx.arc(player.x,player.y,player.radius,0,Math.PI*2);
+    ctx.fillStyle = player.color;
+    ctx.fill();
+    
+    // Draw enemies and move
+    enemies.forEach(e=>{
+        e.x += e.dx;
+        e.y += e.dy;
+        if(e.x<e.radius||e.x>canvas.width-e.radius) e.dx*=-1;
+        if(e.y<e.radius||e.y>canvas.height-e.radius) e.dy*=-1;
+        ctx.beginPath();
+        ctx.arc(e.x,e.y,e.radius,0,Math.PI*2);
+        ctx.fillStyle=e.color;
+        ctx.fill();
+        
+        // Collision detection
+        const dist = Math.hypot(player.x - e.x, player.y - e.y);
+        if(dist < player.radius + e.radius){
+            gameOver=true;
+            alert('Game Over! Time survived: '+Math.floor(score)+'s');
+        }
+    });
+    
+    requestAnimationFrame(update);
+}
+update();
+
+// Spawn enemies every 1s
+setInterval(()=>{ if(!gameOver) spawnEnemy(); }, 1000);
+
+// Score counter
+setInterval(()=>{ if(!gameOver) { score+=0.1; document.querySelector('.score').textContent = 'Time: '+Math.floor(score); }}, 100);
+
+// Player movement
+document.addEventListener('mousemove', e=>{
+    player.x=e.clientX;
+    player.y=e.clientY;
+});
+</script>
+</body>
+</html>
